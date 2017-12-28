@@ -1,66 +1,56 @@
 let express = require("express"),
     app = express(),
     parser = require("body-parser"),
-    mongoose = require("mongoose");
-    Campground = require("./models/campgrounds");
-    seed = require("./seeds");
+    mongoose = require("mongoose"),
+    Campground = require("./models/campgrounds"),
+    Comment = require("./models/comment"),
+    User = require("./models/user"),
+    seed = require("./seeds"),
+    LocalStrategy = require("passport-local"),
+    passport = require("passport"),
+    methodOverride = require("method-override");
 
-seed();
+let campgroundRoutes = require("./routes/campgrounds");
+let commentRoutes = require("./routes/comments");
+let authRoutes = require("./routes/auth");
+
+
+
+// seed(); seed the database
 mongoose.connect("mongodb://localhost/yelp_camp", {useMongoClient: true});
 mongoose.Promise = global.Promise;
 app.use(parser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
+app.use(express.static(__dirname + "/public"));
+app.use(methodOverride("_method"));
 
+// PASSPORT CONFIG
+app.use(require("express-session")({
+    secret: "Once again Rusty wins",
+    resave: false,
+    saveUninitialized: false
+}));
 
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+app.use(function(req, res, next){
+    res.locals.currentUser = req.user;
+    next();
+})
+
+// ===================
 
 app.get("/", function (req, res) {
     res.render("landing");
 });
 
-// show form to create new campground
-app.get("/campgrounds/new", function(req, res) {
-    res.render("new");
-});
+app.use(authRoutes);
+app.use("/campgrounds/:id/comments", commentRoutes);
+app.use("/campgrounds", campgroundRoutes);
 
-// show campground lists
-app.get("/campgrounds", function(req, res) {
-    Campground.find({}, function(err, allCampgrounds) {
-        if(err) {
-            console.log(err);
-        } else {
-            res.render("index", {campgrounds: allCampgrounds});
-        }
-    })
-});
-
-
-// create new campground in database
-app.post("/campgrounds", function(req, res) {
-    let name = req.body.name;
-    let image = req.body.image;
-    let desc = req.body.description;
-    let newCampground = {name: name, image: image, description: desc};
-    Campground.create(newCampground, function(err, newlyCreatedCampground) {
-        if(err) {
-            console.log(err);
-        } else {
-            console.log(newlyCreatedCampground);
-        }
-    });
-    res.redirect("/campgrounds");
-});
-
-// shows more info about one campground
-app.get("/campgrounds/:id", function(req, res) {
-    Campground.findById(req.params.id).populate("comments").exec(function(err, foundCampground) {
-        if(err) {
-            console.log(err);
-        } else {
-            console.log(foundCampground);
-            res.render("show", {campground: foundCampground});
-        }
-    });
-});
 
 app.listen(3000, function(){
     console.log("server running");
