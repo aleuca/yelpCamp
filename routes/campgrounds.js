@@ -11,7 +11,7 @@ router.get("/", function(req, res){
        if(err){
            console.log(err);
        } else {
-          res.render("campgrounds/index",{campgrounds:allCampgrounds});
+          res.render("campgrounds/index",{campgrounds:allCampgrounds, currentUser: req.user});
        }
     });
 });
@@ -53,7 +53,7 @@ router.get("/:id", function(req, res){
         } else {
             console.log(foundCampground)
             //render show template with that campground
-            res.render("campgrounds/show", {campground: foundCampground, user: req.user});
+            res.render("campgrounds/show", {campground: foundCampground, currentUser: req.user});
         }
     });
 });
