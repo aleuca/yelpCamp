@@ -18,8 +18,10 @@ let authRoutes = require("./routes/auth");
 
 
 // seed(); seed the database
-mongoose.connect("mongodb://localhost/yelp_camp", {useMongoClient: true});
+// mongoose.connect("mongodb://localhost/yelp_camp", {useMongoClient: true});
+mongoose.connect("mongodb://aleuca:chocolatetruffles@ds231987.mlab.com:31987/yelpcampalina", {useMongoClient: true})
 mongoose.Promise = global.Promise;
+mongodb://aleuca:chocolateruffles@ds231987.mlab.com:31987/yelpcampalina
 app.use(parser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
