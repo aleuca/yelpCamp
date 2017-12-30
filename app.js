@@ -14,11 +14,10 @@ let express = require("express"),
 let campgroundRoutes = require("./routes/campgrounds");
 let commentRoutes = require("./routes/comments");
 let authRoutes = require("./routes/auth");
+let url = process.env.DATABASEURL || "mongodb://localhost/yelp_camp"
 
 
-console.log(process.env.DATABASEURL);
-mongoose.connect(process.env.DATABASEURL, {useMongoClient: true});
-// mongoose.connect("mongodb://aleuca:chocolatetruffles@ds231987.mlab.com:31987/yelpcampalina", {useMongoClient: true})
+mongoose.connect(url, {useMongoClient: true});
 mongoose.Promise = global.Promise;
 app.use(parser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
