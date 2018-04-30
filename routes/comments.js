@@ -63,7 +63,7 @@ router.put("/:comment_id", middleware.checkCommentOwner, function(req, res){
       if(err){
           res.redirect("back");
       } else {
-          res.redirect("/campgrounds/" + req.params.id );
+          res.redirect("/campgrounds/" + req.params.id);
       }
    });
 });
